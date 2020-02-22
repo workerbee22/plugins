@@ -8,9 +8,9 @@
 - (BOOL)application:(UIApplication*)application
     didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
   // Provide the GoogleMaps API key.
-  NSString* mapsApiKey = [[NSProcessInfo processInfo] environment][@"AIzaSyDg-1ItPN6Yz0b5PJALDLytqrVkaObF0AM"];
+  NSString* mapsApiKey = [[NSProcessInfo processInfo] environment][@"YOUR API KEY HERE"];
   if ([mapsApiKey length] == 0) {
-    mapsApiKey = @"AIzaSyDg-1ItPN6Yz0b5PJALDLytqrVkaObF0AM";
+    mapsApiKey = @"YOUR API KEY HERE";
   }
   [GMSServices provideAPIKey:mapsApiKey];
 

@@ -5,23 +5,25 @@
 package io.flutter.plugins.googlemaps;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 
-/** Receiver of Circle configuration options. */
-interface CircleOptionsSink {
+/** Receiver of GroundOverlay configuration options. */
+interface GroundOverlayOptionsSink {
 
-  void setConsumeTapEvents(boolean consumetapEvents);
+  void setBearing(float bearing);
 
-  void setStrokeColor(int strokeColor);
+  void setImage(BitmapDescriptor image);
 
-  void setFillColor(int fillColor);
+  void setPositionFromBounds(LatLngBounds bounds);
 
-  void setCenter(LatLng center);
+  void setPosition(LatLng location, float width);
 
-  void setRadius(double radius);
+  void setPosition(LatLng location, float width, float height);
 
   void setVisible(boolean visible);
 
-  void setStrokeWidth(float strokeWidth);
+  void setTransparency(float transparency);
 
   void setZIndex(float zIndex);
 }

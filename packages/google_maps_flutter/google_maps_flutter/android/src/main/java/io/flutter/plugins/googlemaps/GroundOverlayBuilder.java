@@ -4,65 +4,58 @@
 
 package io.flutter.plugins.googlemaps;
 
-import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
-class CircleBuilder implements CircleOptionsSink {
-  private final CircleOptions circleOptions;
-  private final float density;
-  private boolean consumeTapEvents;
+class GroundOverlayBuilder implements GroundOverlayOptionsSink {
+  private final GroundOverlayOptions groundOverlayOptions;
 
-  CircleBuilder(float density) {
-    this.circleOptions = new CircleOptions();
-    this.density = density;
+  GroundOverlayBuilder() {
+    this.groundOverlayOptions = new GroundOverlayOptions();
   }
 
-  CircleOptions build() {
-    return circleOptions;
-  }
-
-  boolean consumeTapEvents() {
-    return consumeTapEvents;
+  GroundOverlayOptions build() {
+    return groundOverlayOptions;
   }
 
   @Override
-  public void setFillColor(int color) {
-    circleOptions.fillColor(color);
+  public void setImage(BitmapDescriptor image) {
+    groundOverlayOptions.image(image);
   }
 
   @Override
-  public void setStrokeColor(int color) {
-    circleOptions.strokeColor(color);
+  public void setBearing(float bearing) {
+    groundOverlayOptions.bearing(bearing);
   }
 
   @Override
-  public void setCenter(LatLng center) {
-    circleOptions.center(center);
+  public void setPositionFromBounds(LatLngBounds bounds)  { groundOverlayOptions.positionFromBounds(bounds); }
+
+  /// setPosition has two versions; one with LatLng location and width, the other with width and height
+  @Override
+  public void setPosition(LatLng location, float width)  {
+    groundOverlayOptions.position(location, width);
   }
 
   @Override
-  public void setRadius(double radius) {
-    circleOptions.radius(radius);
-  }
-
-  @Override
-  public void setConsumeTapEvents(boolean consumeTapEvents) {
-    this.consumeTapEvents = consumeTapEvents;
-    circleOptions.clickable(consumeTapEvents);
+  public void setPosition(LatLng location, float width, float height)  {
+    groundOverlayOptions.position(location, width, height);
   }
 
   @Override
   public void setVisible(boolean visible) {
-    circleOptions.visible(visible);
+    groundOverlayOptions.visible(visible);
   }
 
   @Override
-  public void setStrokeWidth(float strokeWidth) {
-    circleOptions.strokeWidth(strokeWidth * density);
+  public void setTransparency(float transparency) {
+    groundOverlayOptions.transparency(transparency);
   }
 
   @Override
   public void setZIndex(float zIndex) {
-    circleOptions.zIndex(zIndex);
+    groundOverlayOptions.zIndex(zIndex);
   }
 }

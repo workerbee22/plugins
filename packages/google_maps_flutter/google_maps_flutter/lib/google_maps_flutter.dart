@@ -17,6 +17,8 @@ part 'src/bitmap.dart';
 part 'src/callbacks.dart';
 part 'src/camera.dart';
 part 'src/cap.dart';
+part 'src/ground_overlay.dart';         // added
+part 'src/ground_overlay_updates.dart';  // added
 part 'src/circle.dart';
 part 'src/circle_updates.dart';
 part 'src/controller.dart';

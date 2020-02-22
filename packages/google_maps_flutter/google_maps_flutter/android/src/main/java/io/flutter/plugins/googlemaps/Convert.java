@@ -7,6 +7,8 @@ package io.flutter.plugins.googlemaps;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.util.Log;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -31,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /** Conversions between JSON-like values and GoogleMaps data types. */
+/// Looks at a String to the start of the data to flag as defaultMarker, fromAsset, fromAssetImage or fromBytes
+/// Corresponding bitmap.dart on the Flutter side sets this up.
 class Convert {
 
   private static BitmapDescriptor toBitmapDescriptor(Object o) {
@@ -52,6 +56,11 @@ class Convert {
         }
       case "fromAssetImage":
         if (data.size() == 3) {
+          /// Android BitmapDescriptorFactory.fromAsset is here: https://developers.google.com/android/reference/com/google/android/gms/maps/model/BitmapDescriptorFactory
+          String test = FlutterMain.getLookupKeyForAsset(toString(data.get(1)));
+
+          Log.d("CONVERT", "***** fromAssetImage, call to FlutterMain.getLookupKeyForAsset:" + test);
+
           return BitmapDescriptorFactory.fromAsset(
               FlutterMain.getLookupKeyForAsset(toString(data.get(1))));
         } else {
@@ -226,6 +235,32 @@ class Convert {
     return new LatLngBounds(toLatLng(data.get(0)), toLatLng(data.get(1)));
   }
 
+  // Have moved inside of interpretGroundOverlayOptions
+//  /// *** Need a toPosition to break up the Position object passed into a LatLng for location and a float  for width
+//  // and height if provided
+//  static Object toPosition(Object o) {
+//    final LatLng location;
+//    final float width;
+//    final float height;
+//    final Map<String, Object> position = new HashMap<>(2);
+//
+//    if (o == null) {
+//      return null;
+//    }
+//    final List<?> data = toList(o);
+//
+//    location = toLatLng(data.get(0));
+//    position.put("location", location);
+//    width = toFloat(data.get(1));
+//    position.put("width", width);
+//    if (data.size() > 2) {
+//      height = toFloat(data.get(2));
+//      position.put("height", height);
+//    }
+//
+//    return position;
+//  }
+
   private static List<?> toList(Object o) {
     return (List<?>) o;
   }
@@ -363,6 +398,7 @@ class Convert {
       sink.setFlat(toBoolean(flat));
     }
     final Object icon = data.get("icon");
+    Log.w("CONVERT", "***** Setting marker icon: " + icon.toString());
     if (icon != null) {
       sink.setIcon(toBitmapDescriptor(icon));
     }
@@ -545,6 +581,81 @@ class Convert {
       throw new IllegalArgumentException("circleId was null");
     } else {
       return circleId;
+    }
+  }
+
+  /// ****** NEW to interpret GroundOverlay Options
+  static String interpretGroundOverlayOptions(Object o, GroundOverlayOptionsSink sink) {
+    final Map<?, ?> data = toMap(o);
+
+    final Object bearing = data.get("bearing");
+    if (bearing != null) {
+      Log.w("CONVERT", "***** Converting bearing: " + bearing.toString());
+      sink.setBearing(toFloat(bearing));
+    }
+
+    final Object bounds = data.get("positionFromBounds");
+    if (bounds != null) {
+      Log.w("CONVERT", "***** Converting bounds: " + bounds.toString());
+      // see above for this function toLatLngBounds
+      sink.setPositionFromBounds(toLatLngBounds(bounds));
+    }
+
+    final Object position = data.get("position");
+    if (position != null) {
+      Log.w("CONVERT", "***** Converting position: " + position.toString());
+      /// Support both versions of the .setPosition call; one with just width, the other with width and height
+      /// Need to break up Position to LatLng and width and optionall height
+
+      final List<?> positionData = toList(position);
+      final LatLng location;
+      final float width;
+      final float height;
+
+      location = toLatLng(positionData.get(0));
+      Log.w("CONVERT", "***** Converting position - location is: " + location.toString());
+      width = toFloat(positionData.get(1));
+      Log.w("CONVERT", "***** Converting position - width is: " + width);
+      if (positionData.size() > 2) {
+        height = toFloat(positionData.get(2));
+        Log.w("CONVERT", "***** Converting position - height is: " + height);
+        sink.setPosition(location, width, height);
+      } else {
+        sink.setPosition(location, width);
+      }
+    }
+
+    final Object image = data.get("image");
+    if (image != null) {
+      Log.w("CONVERT", "***** Setting image: " + image.toString());
+      // see above for this function toBitmapDescriptor
+      sink.setImage(toBitmapDescriptor(image));
+    }
+
+    final Object visible = data.get("visible");
+    if (visible != null) {
+      Log.w("CONVERT", "***** Setting visible: " + visible.toString());
+      sink.setVisible(toBoolean(visible));
+    }
+
+    final Object transparency = data.get("transparency");
+    if (transparency != null) {
+      Log.w("CONVERT", "***** Setting transparency: " + transparency.toString());
+      sink.setTransparency(toFloat(transparency));
+    }
+
+    final Object zIndex = data.get("zIndex");
+    if (zIndex != null) {
+      Log.w("CONVERT", "***** Setting zIndex: " + zIndex.toString());
+      sink.setZIndex(toFloat(zIndex));
+    }
+
+    final String groundOverlayId = (String) data.get("groundOverlayId");
+    if (groundOverlayId == null) {
+      Log.w("CONVERT", "***** Setting groundOverlayId: " + groundOverlayId.toString());
+      throw new IllegalArgumentException("groundOverlayId was null");
+    } else {
+      return groundOverlayId;
     }
   }
 

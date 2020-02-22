@@ -160,6 +160,7 @@ class Circle {
 
   @override
   int get hashCode => circleId.hashCode;
+
 }
 
 Map<CircleId, Circle> _keyByCircleId(Iterable<Circle> circles) {

@@ -38,6 +38,8 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -98,10 +100,12 @@ final class GoogleMapController
   private final PolygonsController polygonsController;
   private final PolylinesController polylinesController;
   private final CirclesController circlesController;
+  private final GroundOverlaysController groundOverlaysController;  // added
   private List<Object> initialMarkers;
   private List<Object> initialPolygons;
   private List<Object> initialPolylines;
   private List<Object> initialCircles;
+  private List<Object> initialGroundOverlays;   // added
 
   GoogleMapController(
       int id,
@@ -128,6 +132,7 @@ final class GoogleMapController
     this.polygonsController = new PolygonsController(methodChannel, density);
     this.polylinesController = new PolylinesController(methodChannel, density);
     this.circlesController = new CirclesController(methodChannel, density);
+    this.groundOverlaysController = new GroundOverlaysController(methodChannel);   // added
   }
 
   @Override
@@ -215,10 +220,12 @@ final class GoogleMapController
     polygonsController.setGoogleMap(googleMap);
     polylinesController.setGoogleMap(googleMap);
     circlesController.setGoogleMap(googleMap);
+    groundOverlaysController.setGoogleMap(googleMap);   // added
     updateInitialMarkers();
     updateInitialPolygons();
     updateInitialPolylines();
     updateInitialCircles();
+    updateInitialGroundOverlays();    // added
   }
 
   @Override
@@ -354,6 +361,17 @@ final class GoogleMapController
           result.success(null);
           break;
         }
+      case "groundOverlays#update":
+      {
+        Object groundOverlaysToAdd = call.argument("groundOverlaysToAdd");
+        groundOverlaysController.addGroundOverlays((List<Object>) groundOverlaysToAdd);
+        Object groundOverlaysToChange = call.argument("groundOverlaysToChange");
+        groundOverlaysController.changeGroundOverlays((List<Object>) groundOverlaysToChange);
+        Object groundOverlayIdsToRemove = call.argument("groundOverlayIdsToRemove");
+        groundOverlaysController.removeGroundOverlays((List<Object>) groundOverlayIdsToRemove);
+        result.success(null);
+        break;
+      }
       case "map#isCompassEnabled":
         {
           result.success(googleMap.getUiSettings().isCompassEnabled());
@@ -793,6 +811,24 @@ final class GoogleMapController
   private void updateInitialCircles() {
     circlesController.addCircles(initialCircles);
   }
+
+  // added
+  @Override
+  public void setInitialGroundOverlays(Object initialGroundOverlays) {
+    this.initialGroundOverlays = (List<Object>) initialGroundOverlays;
+    if (googleMap != null) {
+
+      /// Debugging here to see what I have received
+      Log.w("GOOGLEMAPSCONTROLLER", "***** initialGroundOverlays are: " + this.initialGroundOverlays.toString());
+
+      updateInitialGroundOverlays();
+    }
+  }
+
+  private void updateInitialGroundOverlays() {
+    groundOverlaysController.addGroundOverlays(initialGroundOverlays);
+  }
+
 
   @SuppressLint("MissingPermission")
   private void updateMyLocationSettings() {

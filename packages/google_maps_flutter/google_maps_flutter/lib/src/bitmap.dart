@@ -79,16 +79,19 @@ class BitmapDescriptor {
     String package,
   }) async {
     if (configuration.devicePixelRatio != null) {
+
+      print("***** Flutter side - BitmapDescriptor converting assetName: " + assetName);
+
       return BitmapDescriptor._(<dynamic>[
         'fromAssetImage',
         assetName,
         configuration.devicePixelRatio,
       ]);
     }
-    final AssetImage assetImage =
-        AssetImage(assetName, package: package, bundle: bundle);
-    final AssetBundleImageKey assetBundleImageKey =
-        await assetImage.obtainKey(configuration);
+
+    final AssetImage assetImage = AssetImage(assetName, package: package, bundle: bundle);
+    final AssetBundleImageKey assetBundleImageKey = await assetImage.obtainKey(configuration);
+
     return BitmapDescriptor._(<dynamic>[
       'fromAssetImage',
       assetBundleImageKey.name,

@@ -1,76 +1,74 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/// GroundOverlay
+/// Contains all of the implemented methods for the Ground Overlay object. Note not all methods may be implemented.
+/// Based on CircleController.java and CircleOptionsSink.java
 
 package io.flutter.plugins.googlemaps;
 
-import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 
-/** Controller of a single Circle on the map. */
-class CircleController implements CircleOptionsSink {
-  private final Circle circle;
-  private final String googleMapsCircleId;
-  private final float density;
-  private boolean consumeTapEvents;
+/** Controller of a single GroundOverlay on the map. */
+class GroundOverlayController implements GroundOverlayOptionsSink {
+  private final GroundOverlay groundOverlay;
+  private final String googleMapsGroundOverlayId;
 
-  CircleController(Circle circle, boolean consumeTapEvents, float density) {
-    this.circle = circle;
-    this.consumeTapEvents = consumeTapEvents;
-    this.density = density;
-    this.googleMapsCircleId = circle.getId();
+  GroundOverlayController(GroundOverlay groundOverlay) {
+    this.groundOverlay = groundOverlay;
+    this.googleMapsGroundOverlayId = groundOverlay.getId();
   }
 
   void remove() {
-    circle.remove();
+    groundOverlay.remove();
   }
 
   @Override
-  public void setConsumeTapEvents(boolean consumeTapEvents) {
-    this.consumeTapEvents = consumeTapEvents;
-    circle.setClickable(consumeTapEvents);
+  public void setBearing(float bearing) {
+    groundOverlay.setBearing(bearing);
   }
 
   @Override
-  public void setStrokeColor(int strokeColor) {
-    circle.setStrokeColor(strokeColor);
+  public void setImage(BitmapDescriptor image) {
+    groundOverlay.setImage(image);
+  }
+
+  /// setPosition has two versions; one with LatLng location and width, the other with width and height
+  @Override
+  public void setPosition(LatLng location, float width)  {
+    groundOverlay.setPosition(location);
+    groundOverlay.setDimensions(width);
   }
 
   @Override
-  public void setFillColor(int fillColor) {
-    circle.setFillColor(fillColor);
+  public void setPosition(LatLng location, float width, float height)  {
+    groundOverlay.setPosition(location);
+    groundOverlay.setDimensions(width);
+    groundOverlay.setDimensions(height);
   }
 
   @Override
-  public void setCenter(LatLng center) {
-    circle.setCenter(center);
-  }
-
-  @Override
-  public void setRadius(double radius) {
-    circle.setRadius(radius);
+  public void setPositionFromBounds(LatLngBounds bounds) {
+    groundOverlay.setPositionFromBounds(bounds);
   }
 
   @Override
   public void setVisible(boolean visible) {
-    circle.setVisible(visible);
+    groundOverlay.setVisible(visible);
   }
 
   @Override
-  public void setStrokeWidth(float strokeWidth) {
-    circle.setStrokeWidth(strokeWidth * density);
+  public void setTransparency(float transparency) {
+    groundOverlay.setTransparency(transparency);
   }
 
   @Override
   public void setZIndex(float zIndex) {
-    circle.setZIndex(zIndex);
+    groundOverlay.setZIndex(zIndex);
   }
 
-  String getGoogleMapsCircleId() {
-    return googleMapsCircleId;
+  String getGoogleMapsGroundOverlayId() {
+    return googleMapsGroundOverlayId;
   }
 
-  boolean consumeTapEvents() {
-    return consumeTapEvents;
-  }
 }
